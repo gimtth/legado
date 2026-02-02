@@ -1,5 +1,7 @@
 package io.legado.app.model.ai
 
+import io.legado.app.data.entities.AIBookRecommendation
+import io.legado.app.data.entities.AIRecommendationResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -203,6 +205,95 @@ $limitedContent
                 .getJSONObject(0)
                 .getString("text")
                 .trim()
+        }
+    }
+    
+    /**
+     * 推荐书籍
+     * @param provider AI 服务提供商
+     * @param apiKey API 密钥
+     * @param userInput 用户输入的需求描述
+     * @return 推荐书籍列表
+     */
+    suspend fun recommendBooks(
+        provider: String,
+        apiKey: String,
+        userInput: String
+    ): AIRecommendationResponse = withContext(Dispatchers.IO) {
+        
+        val prompt = """
+你是一个专业的网络小说推荐助手。用户会告诉你他想看什么类型的书，你需要推荐5本符合要求的网络小说。
+
+要求：
+1. 必须返回JSON格式
+2. 每本书包含：书名(title)、作者(author)、推荐理由(reason，50字内)、标签(tags，数组)
+3. 推荐的书要真实存在且知名度较高
+4. 优先推荐完结作品或热门连载
+
+用户需求：$userInput
+
+请严格按照以下JSON格式返回，不要有任何其他内容：
+{
+  "recommendations": [
+    {"title": "书名", "author": "作者", "reason": "推荐理由", "tags": ["标签1", "标签2"]}
+  ]
+}
+        """.trimIndent()
+        
+        val responseText = when (provider.lowercase()) {
+            "deepseek" -> callDeepSeek(apiKey, prompt)
+            "glm" -> callGLM(apiKey, prompt)
+            "gemini" -> callGemini(apiKey, prompt)
+            else -> throw IllegalArgumentException("不支持的 AI 服务: $provider")
+        }
+        
+        // 解析 JSON 响应
+        parseRecommendationResponse(responseText)
+    }
+    
+    /**
+     * 解析推荐响应
+     */
+    private fun parseRecommendationResponse(responseText: String): AIRecommendationResponse {
+        try {
+            // 尝试提取 JSON 部分（有时 AI 会在前后添加说明文字）
+            val jsonStart = responseText.indexOf("{")
+            val jsonEnd = responseText.lastIndexOf("}") + 1
+            
+            if (jsonStart == -1 || jsonEnd <= jsonStart) {
+                throw Exception("响应中未找到有效的 JSON 格式")
+            }
+            
+            val jsonText = responseText.substring(jsonStart, jsonEnd)
+            val jsonObject = JSONObject(jsonText)
+            val recommendationsArray = jsonObject.getJSONArray("recommendations")
+            
+            val recommendations = mutableListOf<AIBookRecommendation>()
+            for (i in 0 until recommendationsArray.length()) {
+                val item = recommendationsArray.getJSONObject(i)
+                
+                val tags = mutableListOf<String>()
+                val tagsArray = item.optJSONArray("tags")
+                if (tagsArray != null) {
+                    for (j in 0 until tagsArray.length()) {
+                        tags.add(tagsArray.getString(j))
+                    }
+                }
+                
+                recommendations.add(
+                    AIBookRecommendation(
+                        title = item.getString("title"),
+                        author = item.getString("author"),
+                        reason = item.getString("reason"),
+                        tags = tags
+                    )
+                )
+            }
+            
+            return AIRecommendationResponse(recommendations)
+            
+        } catch (e: Exception) {
+            throw Exception("解析推荐结果失败: ${e.message}\n原始响应: $responseText")
         }
     }
 }

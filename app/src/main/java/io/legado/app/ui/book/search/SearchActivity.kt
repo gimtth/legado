@@ -69,6 +69,16 @@ class SearchActivity : VMBaseActivity<ActivityBookSearchBinding, SearchViewModel
 
     override val binding by viewBinding(ActivityBookSearchBinding::inflate)
     override val viewModel by viewModels<SearchViewModel>()
+    
+    private val aiSearchLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            result.data?.getStringExtra("searchKey")?.let { searchKey ->
+                searchView.setQuery(searchKey, true)
+            }
+        }
+    }
 
     private val adapter by lazy { SearchAdapter(this, this) }
     private val bookAdapter by lazy {
@@ -285,6 +295,11 @@ class SearchActivity : VMBaseActivity<ActivityBookSearchBinding, SearchViewModel
         }
         binding.fbStartStop.applyNavigationBarMargin(true)
         binding.tvClearHistory.setOnClickListener { alertClearHistory() }
+        
+        // AI 搜书入口点击事件
+        binding.llAiSearch.setOnClickListener {
+            launchAIBookSearch()
+        }
     }
 
     private fun initData() {
@@ -535,6 +550,14 @@ class SearchActivity : VMBaseActivity<ActivityBookSearchBinding, SearchViewModel
             return
         }
         super.finish()
+    }
+
+    /**
+     * 启动 AI 智能找书页面
+     */
+    private fun launchAIBookSearch() {
+        val intent = Intent(this, AIBookSearchActivity::class.java)
+        aiSearchLauncher.launch(intent)
     }
 
     companion object {

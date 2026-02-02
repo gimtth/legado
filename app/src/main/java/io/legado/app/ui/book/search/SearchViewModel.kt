@@ -14,10 +14,14 @@ import io.legado.app.help.book.isNotShelf
 import io.legado.app.help.config.AppConfig
 import io.legado.app.model.webBook.SearchModel
 import io.legado.app.utils.ConflateLiveData
+import io.legado.app.utils.getPrefString
+import io.legado.app.utils.putPrefString
 import io.legado.app.utils.toastOnUi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.mapLatest
+import org.json.JSONArray
+import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -157,6 +161,241 @@ class SearchViewModel(application: Application) : BaseViewModel(application) {
     override fun onCleared() {
         super.onCleared()
         searchModel.close()
+    }
+
+    // ==================== AI 搜书功能 ====================
+    
+    val chatMessagesLiveData = MutableLiveData<List<io.legado.app.data.entities.ChatMessage>>()
+    val aiSearchErrorLiveData = MutableLiveData<String>()
+    
+    private val chatMessages = mutableListOf<io.legado.app.data.entities.ChatMessage>()
+    private val chatHistoryKey = "ai_book_search_chat_history"
+    
+    /**
+     * 加载聊天历史
+     */
+    fun loadChatHistory() {
+        execute {
+            val historyJson = context.getPrefString(chatHistoryKey)
+            if (!historyJson.isNullOrEmpty()) {
+                try {
+                    val jsonArray = JSONArray(historyJson)
+                    chatMessages.clear()
+                    
+                    for (i in 0 until jsonArray.length()) {
+                        val item = jsonArray.getJSONObject(i)
+                        val isUser = item.getBoolean("isUser")
+                        val content = item.getString("content")
+                        
+                        if (isUser) {
+                            chatMessages.add(
+                                io.legado.app.data.entities.ChatMessage(
+                                    content = content,
+                                    isUser = true
+                                )
+                            )
+                        } else {
+                            // 解析推荐书籍
+                            val recommendations = mutableListOf<io.legado.app.data.entities.AIBookRecommendation>()
+                            val recsArray = item.optJSONArray("recommendations")
+                            if (recsArray != null) {
+                                for (j in 0 until recsArray.length()) {
+                                    val rec = recsArray.getJSONObject(j)
+                                    val tags = mutableListOf<String>()
+                                    val tagsArray = rec.optJSONArray("tags")
+                                    if (tagsArray != null) {
+                                        for (k in 0 until tagsArray.length()) {
+                                            tags.add(tagsArray.getString(k))
+                                        }
+                                    }
+                                    recommendations.add(
+                                        io.legado.app.data.entities.AIBookRecommendation(
+                                            title = rec.getString("title"),
+                                            author = rec.getString("author"),
+                                            reason = rec.getString("reason"),
+                                            tags = tags
+                                        )
+                                    )
+                                }
+                            }
+                            
+                            chatMessages.add(
+                                io.legado.app.data.entities.ChatMessage(
+                                    content = content,
+                                    isUser = false,
+                                    recommendations = recommendations.ifEmpty { null }
+                                )
+                            )
+                        }
+                    }
+                    
+                    chatMessagesLiveData.postValue(chatMessages.toList())
+                } catch (e: Exception) {
+                    AppLog.put("加载聊天历史失败", e)
+                }
+            }
+        }
+    }
+    
+    /**
+     * 保存聊天历史
+     */
+    private fun saveChatHistory() {
+        execute {
+            try {
+                val jsonArray = JSONArray()
+                
+                chatMessages.forEach { message ->
+                    // 不保存加载状态和欢迎消息
+                    if (!message.isLoading && !message.isWelcome) {
+                        val item = JSONObject()
+                        item.put("isUser", message.isUser)
+                        item.put("content", message.content)
+                        
+                        if (!message.recommendations.isNullOrEmpty()) {
+                            val recsArray = JSONArray()
+                            message.recommendations.forEach { rec ->
+                                val recObj = JSONObject()
+                                recObj.put("title", rec.title)
+                                recObj.put("author", rec.author)
+                                recObj.put("reason", rec.reason)
+                                
+                                val tagsArray = JSONArray()
+                                rec.tags.forEach { tag ->
+                                    tagsArray.put(tag)
+                                }
+                                recObj.put("tags", tagsArray)
+                                
+                                recsArray.put(recObj)
+                            }
+                            item.put("recommendations", recsArray)
+                        }
+                        
+                        jsonArray.put(item)
+                    }
+                }
+                
+                context.putPrefString(chatHistoryKey, jsonArray.toString())
+            } catch (e: Exception) {
+                AppLog.put("保存聊天历史失败", e)
+            }
+        }
+    }
+    
+    /**
+     * 添加用户消息
+     */
+    fun addUserMessage(content: String) {
+        chatMessages.add(
+            io.legado.app.data.entities.ChatMessage(
+                content = content,
+                isUser = true
+            )
+        )
+        chatMessagesLiveData.postValue(chatMessages.toList())
+        saveChatHistory()  // 保存历史
+    }
+    
+    /**
+     * 添加 AI 消息
+     */
+    fun addAIMessage(content: String, recommendations: List<io.legado.app.data.entities.AIBookRecommendation>? = null) {
+        chatMessages.add(
+            io.legado.app.data.entities.ChatMessage(
+                content = content,
+                isUser = false,
+                recommendations = recommendations
+            )
+        )
+        chatMessagesLiveData.postValue(chatMessages.toList())
+        saveChatHistory()  // 保存历史
+    }
+    
+    /**
+     * 添加欢迎消息（不保存到历史）
+     */
+    fun addWelcomeMessage(content: String) {
+        chatMessages.add(
+            io.legado.app.data.entities.ChatMessage(
+                content = content,
+                isUser = false,
+                isWelcome = true  // 标记为欢迎消息
+            )
+        )
+        chatMessagesLiveData.postValue(chatMessages.toList())
+        // 不保存欢迎消息到历史
+    }
+    
+    /**
+     * 添加加载消息
+     */
+    private fun addLoadingMessage() {
+        chatMessages.add(
+            io.legado.app.data.entities.ChatMessage(
+                content = "",
+                isUser = false,
+                isLoading = true
+            )
+        )
+        chatMessagesLiveData.postValue(chatMessages.toList())
+    }
+    
+    /**
+     * 移除加载消息
+     */
+    private fun removeLoadingMessage() {
+        chatMessages.removeAll { it.isLoading }
+        chatMessagesLiveData.postValue(chatMessages.toList())
+    }
+    
+    /**
+     * 添加错误消息
+     */
+    fun addErrorMessage(error: String) {
+        removeLoadingMessage()
+        addAIMessage("抱歉，推荐失败了：$error\n\n请检查网络连接或 API 配置，然后重试。")
+    }
+    
+    /**
+     * 请求书籍推荐
+     */
+    fun requestBookRecommendation(userInput: String) {
+        val apiKey = io.legado.app.help.config.AppConfig.aiApiKey
+        if (apiKey.isBlank()) {
+            aiSearchErrorLiveData.postValue("请先在设置中配置 AI API Key")
+            return
+        }
+        
+        addLoadingMessage()
+        aiSearchErrorLiveData.postValue("")
+        
+        execute {
+            val provider = io.legado.app.help.config.AppConfig.aiProvider
+            
+            // 调用 AI 服务推荐书籍
+            val response = io.legado.app.model.ai.AISummaryService.recommendBooks(
+                provider = provider,
+                apiKey = apiKey,
+                userInput = userInput
+            )
+            
+            // 移除加载消息并添加推荐结果
+            removeLoadingMessage()
+            addAIMessage("", response.recommendations)
+            
+        }.onError {
+            aiSearchErrorLiveData.postValue(it.localizedMessage ?: "推荐失败")
+        }
+    }
+    
+    /**
+     * 清空聊天记录
+     */
+    fun clearChatMessages() {
+        chatMessages.clear()
+        chatMessagesLiveData.postValue(emptyList())
+        // 清除保存的历史
+        context.putPrefString(chatHistoryKey, "")
     }
 
 }

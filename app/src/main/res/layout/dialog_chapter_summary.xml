@@ -156,7 +156,7 @@
                 android:layout_height="80dp"
                 android:alpha="0.3"
                 android:contentDescription="@string/empty"
-                android:src="@drawable/ic_read_aloud"
+                android:src="@drawable/ic_empty_summary"
                 app:tint="@color/primaryText" />
 
             <TextView

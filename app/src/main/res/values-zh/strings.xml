@@ -1249,5 +1249,10 @@
     <string name="about_feature">关于功能</string>
     <string name="ai_feature_intro">功能介绍</string>
     <string name="ai_feature_intro_summary">AI 章节摘要功能说明</string>
+    <string name="ai_book_search">AI 智能找书</string>
+    <string name="ai_search_hint">描述你想看的书...</string>
+    <string name="send">发送</string>
+    <string name="arrow_right">箭头</string>
+    <string name="clear_history">清空历史</string>
 </resources>
 

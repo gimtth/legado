@@ -198,6 +198,12 @@
         <activity
             android:name=".ui.book.search.SearchActivity"
             android:launchMode="standard" />
+        <!-- AI 智能找书 -->
+        <activity
+            android:name=".ui.book.search.AIBookSearchActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="behind"
+            android:windowSoftInputMode="adjustResize" />
         <!-- 关于界面 -->
         <activity
             android:name=".ui.about.AboutActivity"

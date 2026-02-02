@@ -1251,5 +1251,10 @@
     <string name="about_feature">About Feature</string>
     <string name="ai_feature_intro">Feature Introduction</string>
     <string name="ai_feature_intro_summary">AI chapter summary feature description</string>
+    <string name="ai_book_search">AI Book Search</string>
+    <string name="ai_search_hint">Describe the book you want to read...</string>
+    <string name="send">Send</string>
+    <string name="arrow_right">Arrow Right</string>
+    <string name="clear_history">Clear History</string>
 
 </resources>
