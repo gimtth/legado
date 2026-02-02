@@ -90,7 +90,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="📝 摘要"
+                        android:text="摘要"
                         android:textColor="@color/primaryText"
                         android:textSize="14sp"
                         android:textStyle="bold" />

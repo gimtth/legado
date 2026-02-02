@@ -4,7 +4,9 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
+import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import io.legado.app.R
 import io.legado.app.lib.dialogs.alert
@@ -20,6 +22,11 @@ class AIConfigFragment : PreferenceFragment(),
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_config_ai)
+        
+        // 设置 API Key 输入框为密码类型
+        findPreference<EditTextPreference>("aiApiKey")?.setOnBindEditTextListener { editText ->
+            editText.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -94,12 +101,7 @@ class AIConfigFragment : PreferenceFragment(),
                 • 选择 AI 服务商并输入 API Key
                 • 阅读时点击菜单中的"AI 摘要"
                 
-                4. 成本说明
-                • DeepSeek：约 0.003 元/章
-                • GLM-4：完全免费
-                • Gemini：免费额度充足
-                
-                5. 隐私提示
+                4. 隐私提示
                 • 章节内容会发送到 AI 服务商
                 • API Key 仅存储在本地
                 • 建议只对公开书籍使用

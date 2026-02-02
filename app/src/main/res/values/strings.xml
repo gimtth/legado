@@ -1237,9 +1237,6 @@
     <string name="sys_image_picker">系统图片选择器</string>
 
     <!-- AI Features -->
-    <string name="ai_summary_feature">AI Chapter Summary</string>
-    <string name="ai_enabled">Enable AI Summary</string>
-    <string name="ai_enabled_summary">Use AI to generate chapter summaries</string>
     <string name="ai_provider">AI Provider</string>
     <string name="ai_provider_summary">Select AI service provider</string>
     <string name="ai_api_key">API Key</string>

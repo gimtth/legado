@@ -589,12 +589,6 @@ class ReadBookViewModel(application: Application) : BaseViewModel(application) {
         val chapter = ReadBook.curTextChapter?.chapter ?: return
         val content = ReadBook.curTextChapter?.getContent() ?: return
         
-        // 检查是否启用 AI 功能
-        if (!AppConfig.aiEnabled) {
-            summaryErrorLiveData.postValue("请先在设置中启用 AI 功能")
-            return
-        }
-        
         val apiKey = AppConfig.aiApiKey
         if (apiKey.isBlank()) {
             summaryErrorLiveData.postValue("请先在设置中配置 AI API Key")

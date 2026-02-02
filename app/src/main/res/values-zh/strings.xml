@@ -1235,9 +1235,6 @@
     <string name="sys_image_picker">系统图片选择器</string>
 
     <!-- AI 功能相关 -->
-    <string name="ai_summary_feature">AI 章节摘要</string>
-    <string name="ai_enabled">启用 AI 摘要</string>
-    <string name="ai_enabled_summary">使用 AI 生成章节摘要</string>
     <string name="ai_provider">AI 服务商</string>
     <string name="ai_provider_summary">选择 AI 服务提供商</string>
     <string name="ai_api_key">API Key</string>
