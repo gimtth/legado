@@ -562,4 +562,93 @@ class ReadBookViewModel(application: Application) : BaseViewModel(application) {
         }
     }
 
+    // ==================== AI 章节摘要相关 ====================
+    
+    val chapterSummaryLiveData = MutableLiveData<io.legado.app.data.entities.ChapterSummary?>()
+    val summaryLoadingLiveData = MutableLiveData<Boolean>()
+    val summaryErrorLiveData = MutableLiveData<String>()
+    
+    /**
+     * 加载缓存的摘要
+     */
+    fun loadCachedSummary() {
+        val book = ReadBook.book ?: return
+        val chapter = ReadBook.curTextChapter?.chapter ?: return
+        
+        execute {
+            val cached = appDb.chapterSummaryDao.get(book.bookUrl, chapter.url)
+            chapterSummaryLiveData.postValue(cached)
+        }
+    }
+    
+    /**
+     * 生成章节摘要
+     */
+    fun generateChapterSummary() {
+        val book = ReadBook.book ?: return
+        val chapter = ReadBook.curTextChapter?.chapter ?: return
+        val content = ReadBook.curTextChapter?.getContent() ?: return
+        
+        // 检查是否启用 AI 功能
+        if (!AppConfig.aiEnabled) {
+            summaryErrorLiveData.postValue("请先在设置中启用 AI 功能")
+            return
+        }
+        
+        val apiKey = AppConfig.aiApiKey
+        if (apiKey.isBlank()) {
+            summaryErrorLiveData.postValue("请先在设置中配置 AI API Key")
+            return
+        }
+        
+        summaryLoadingLiveData.postValue(true)
+        summaryErrorLiveData.postValue("")
+        
+        execute {
+            val provider = AppConfig.aiProvider
+            
+            // 调用 AI 服务生成摘要
+            val summaryText = io.legado.app.model.ai.AISummaryService.generateSummary(
+                provider = provider,
+                apiKey = apiKey,
+                bookName = book.name,
+                chapterTitle = chapter.title,
+                content = content
+            )
+            
+            // 保存到数据库
+            val chapterSummary = io.legado.app.data.entities.ChapterSummary(
+                bookUrl = book.bookUrl,
+                chapterUrl = chapter.url,
+                summary = summaryText,
+                aiProvider = provider,
+                createTime = System.currentTimeMillis()
+            )
+            appDb.chapterSummaryDao.insert(chapterSummary)
+            
+            // 更新 LiveData
+            chapterSummaryLiveData.postValue(chapterSummary)
+        }.onError {
+            summaryErrorLiveData.postValue("生成失败: ${it.localizedMessage}")
+        }.onFinally {
+            summaryLoadingLiveData.postValue(false)
+        }
+    }
+    
+    /**
+     * 重新生成章节摘要
+     */
+    fun regenerateChapterSummary() {
+        val book = ReadBook.book ?: return
+        val chapter = ReadBook.curTextChapter?.chapter ?: return
+        
+        execute {
+            // 删除旧的摘要
+            appDb.chapterSummaryDao.delete(book.bookUrl, chapter.url)
+        }.onSuccess {
+            // 重新生成
+            generateChapterSummary()
+        }
+    }
+
 }

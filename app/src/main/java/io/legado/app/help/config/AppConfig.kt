@@ -738,5 +738,19 @@ object AppConfig : SharedPreferences.OnSharedPreferenceChangeListener {
             appCtx.putPrefBoolean(PreferKey.welcomeShowIconDark, value)
         }
 
+    // ==================== AI 功能配置 ====================
+    
+    var aiEnabled: Boolean
+        get() = appCtx.getPrefBoolean(PreferKey.aiEnabled, false)
+        set(value) = appCtx.putPrefBoolean(PreferKey.aiEnabled, value)
+    
+    var aiProvider: String
+        get() = appCtx.getPrefString(PreferKey.aiProvider, "deepseek") ?: "deepseek"
+        set(value) = appCtx.putPrefString(PreferKey.aiProvider, value)
+    
+    var aiApiKey: String
+        get() = appCtx.getPrefString(PreferKey.aiApiKey, "") ?: ""
+        set(value) = appCtx.putPrefString(PreferKey.aiApiKey, value)
+
 }
 

@@ -186,4 +186,9 @@ object PreferKey {
     const val showReadTitleAddition = "showReadTitleAddition"
     const val readBarStyleFollowPage = "readBarStyleFollowPage"
     const val contentSelectSpeakMod = "contentReadAloudMod"
+    
+    // AI 功能相关
+    const val aiEnabled = "aiEnabled"
+    const val aiProvider = "aiProvider"
+    const val aiApiKey = "aiApiKey"
 }

@@ -1215,6 +1215,13 @@ class ReadBookActivity : BaseReadBookActivity(),
         showDialogFragment<MoreConfigDialog>()
     }
 
+    /**
+     * 显示 AI 摘要
+     */
+    override fun showAISummary() {
+        showDialogFragment<SummaryDialog>()
+    }
+
     override fun showSearchSetting() {
         showDialogFragment<MoreConfigDialog>()
     }

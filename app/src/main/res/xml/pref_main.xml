@@ -72,6 +72,13 @@
             app:iconSpaceReserved="false" />
 
         <io.legado.app.lib.prefs.Preference
+            android:icon="@drawable/ic_ai_summary"
+            android:key="ai_setting"
+            android:summary="@string/ai_setting_s"
+            android:title="@string/ai_setting"
+            app:iconSpaceReserved="false" />
+
+        <io.legado.app.lib.prefs.Preference
             android:icon="@drawable/ic_cfg_other"
             android:key="setting"
             android:summary="@string/other_setting_s"

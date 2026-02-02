@@ -209,6 +209,8 @@ class ReadMenu @JvmOverloads constructor(
         tvReadAloud.setTextColor(textColor)
         ivFont.setColorFilter(textColor, PorterDuff.Mode.SRC_IN)
         tvFont.setTextColor(textColor)
+        ivAiSummary.setColorFilter(textColor, PorterDuff.Mode.SRC_IN)
+        tvAiSummary.setTextColor(textColor)
         ivSetting.setColorFilter(textColor, PorterDuff.Mode.SRC_IN)
         tvSetting.setTextColor(textColor)
         vwBrightnessPosAdjust.setColorFilter(textColor, PorterDuff.Mode.SRC_IN)
@@ -486,6 +488,13 @@ class ReadMenu @JvmOverloads constructor(
             }
         }
 
+        //AI 摘要
+        llAiSummary.setOnClickListener {
+            runMenuOut {
+                callBack.showAISummary()
+            }
+        }
+
         //设置
         llSetting.setOnClickListener {
             runMenuOut {
@@ -576,6 +585,7 @@ class ReadMenu @JvmOverloads constructor(
         fun showReadStyle()
         fun showMoreSetting()
         fun showReadAloudDialog()
+        fun showAISummary()
         fun upSystemUiVisibility()
         fun onClickReadAloud()
         fun showHelp()

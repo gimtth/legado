@@ -72,6 +72,8 @@
     <string name="setting">Settings</string>
     <string name="theme_setting">Theme settings</string>
     <string name="theme_setting_s">Some settings related to interface or color</string>
+    <string name="ai_setting">AI Settings</string>
+    <string name="ai_setting_s">AI-powered summary and analysis features</string>
     <string name="other_setting">Other settings</string>
     <string name="other_setting_s">Some function-related settings</string>
     <string name="about">About</string>
@@ -1233,4 +1235,24 @@
     <string name="auto_check_new_backup_t">自动检查新备份</string>
     <string name="auto_check_new_backup_s">打开软件时检查是否有新备份，有新备份时提示是否更新</string>
     <string name="sys_image_picker">系统图片选择器</string>
+
+    <!-- AI Features -->
+    <string name="ai_summary_feature">AI Chapter Summary</string>
+    <string name="ai_enabled">Enable AI Summary</string>
+    <string name="ai_enabled_summary">Use AI to generate chapter summaries</string>
+    <string name="ai_provider">AI Provider</string>
+    <string name="ai_provider_summary">Select AI service provider</string>
+    <string name="ai_api_key">API Key</string>
+    <string name="ai_api_key_summary">Enter your API key</string>
+    <string name="help_tutorial">Help &amp; Tutorial</string>
+    <string name="ai_help_deepseek">DeepSeek Tutorial</string>
+    <string name="ai_help_deepseek_summary">How to get DeepSeek API Key</string>
+    <string name="ai_help_glm">GLM-4 Tutorial</string>
+    <string name="ai_help_glm_summary">How to get Zhipu AI API Key</string>
+    <string name="ai_help_gemini">Gemini Tutorial</string>
+    <string name="ai_help_gemini_summary">How to get Google Gemini API Key</string>
+    <string name="about_feature">About Feature</string>
+    <string name="ai_feature_intro">Feature Introduction</string>
+    <string name="ai_feature_intro_summary">AI chapter summary feature description</string>
+
 </resources>

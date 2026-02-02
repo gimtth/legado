@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <!-- 顶部工具栏 -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tool_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="?attr/actionBarStyle"
+        app:popupTheme="@style/AppTheme.PopupOverlay"
+        app:title="AI 章节摘要"
+        app:titleTextAppearance="@style/ToolbarTitle" />
+
+    <!-- 内容区域 -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- 加载中状态 -->
+        <LinearLayout
+            android:id="@+id/ll_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:indeterminate="true" />
+
+            <TextView
+                android:id="@+id/tv_loading_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="AI 正在生成摘要..."
+                android:textColor="@color/secondaryText"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <!-- 摘要内容 -->
+        <ScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- 章节标题 -->
+                <TextView
+                    android:id="@+id/tv_chapter_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primaryText"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="第一章 少年张无忌" />
+
+                <!-- 分割线 -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@color/md_grey_400" />
+
+                <!-- 摘要标签 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📝 摘要"
+                        android:textColor="@color/primaryText"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
+
+                    <!-- AI 服务商标识 -->
+                    <TextView
+                        android:id="@+id/tv_ai_provider"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/shape_fillet_btn"
+                        android:paddingLeft="8dp"
+                        android:paddingTop="2dp"
+                        android:paddingRight="8dp"
+                        android:paddingBottom="2dp"
+                        android:textColor="@color/secondaryText"
+                        android:textSize="10sp"
+                        tools:text="DeepSeek" />
+
+                </LinearLayout>
+
+                <!-- 摘要内容 -->
+                <TextView
+                    android:id="@+id/tv_summary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:lineSpacingExtra="4dp"
+                    android:textColor="@color/primaryText"
+                    android:textIsSelectable="true"
+                    android:textSize="15sp"
+                    tools:text="本章讲述了少年张无忌初到武当山的经历。张无忌自幼体弱多病，但天资聪颖，深得张三丰喜爱。在武当山上，他开始学习武功，展现出惊人的悟性。" />
+
+                <!-- 生成时间 -->
+                <TextView
+                    android:id="@+id/tv_create_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textColor="@color/secondaryText"
+                    android:textSize="12sp"
+                    tools:text="生成于 2026-02-02 15:30" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <!-- 空状态 -->
+        <LinearLayout
+            android:id="@+id/ll_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:alpha="0.3"
+                android:contentDescription="@string/empty"
+                android:src="@drawable/ic_read_aloud"
+                app:tint="@color/primaryText" />
+
+            <TextView
+                android:id="@+id/tv_empty_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="暂无摘要"
+                android:textColor="@color/secondaryText"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="点击下方按钮生成 AI 摘要"
+                android:textColor="@color/secondaryText"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!-- 错误状态 -->
+        <LinearLayout
+            android:id="@+id/ll_error"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:alpha="0.3"
+                android:contentDescription="@string/error"
+                android:src="@drawable/ic_bug_report"
+                app:tint="@color/primaryText" />
+
+            <TextView
+                android:id="@+id/tv_error_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:textColor="@color/secondaryText"
+                android:textSize="14sp"
+                tools:text="生成失败：网络错误" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!-- 底部按钮区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_menu"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <!-- 生成按钮 -->
+        <TextView
+            android:id="@+id/tv_generate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_fillet_btn_bg"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:padding="12dp"
+            android:text="生成摘要"
+            android:textColor="@color/primaryText"
+            android:textSize="14sp" />
+
+        <!-- 重新生成按钮 -->
+        <TextView
+            android:id="@+id/tv_regenerate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_fillet_btn_bg"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:padding="12dp"
+            android:text="重新生成"
+            android:textColor="@color/primaryText"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <!-- 关闭按钮 -->
+        <TextView
+            android:id="@+id/tv_close"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_fillet_btn_bg"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:padding="12dp"
+            android:text="关闭"
+            android:textColor="@color/primaryText"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+</LinearLayout>

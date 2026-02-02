@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <io.legado.app.lib.prefs.PreferenceCategory
+        android:title="@string/ai_summary_feature"
+        app:iconSpaceReserved="false">
+
+        <io.legado.app.lib.prefs.SwitchPreference
+            android:defaultValue="false"
+            android:key="aiEnabled"
+            android:summary="@string/ai_enabled_summary"
+            android:title="@string/ai_enabled"
+            app:iconSpaceReserved="false" />
+
+        <io.legado.app.lib.prefs.NameListPreference
+            android:defaultValue="deepseek"
+            android:entries="@array/ai_providers"
+            android:entryValues="@array/ai_provider_values"
+            android:key="aiProvider"
+            android:summary="@string/ai_provider_summary"
+            android:title="@string/ai_provider"
+            app:iconSpaceReserved="false" />
+
+        <io.legado.app.lib.prefs.EditTextPreference
+            android:key="aiApiKey"
+            android:summary="@string/ai_api_key_summary"
+            android:title="@string/ai_api_key"
+            app:iconSpaceReserved="false" />
+
+    </io.legado.app.lib.prefs.PreferenceCategory>
+
+    <io.legado.app.lib.prefs.PreferenceCategory
+        android:title="@string/help_tutorial"
+        app:iconSpaceReserved="false">
+
+        <io.legado.app.lib.prefs.Preference
+            android:key="ai_help_deepseek"
+            android:summary="@string/ai_help_deepseek_summary"
+            android:title="@string/ai_help_deepseek"
+            app:iconSpaceReserved="false" />
+
+        <io.legado.app.lib.prefs.Preference
+            android:key="ai_help_glm"
+            android:summary="@string/ai_help_glm_summary"
+            android:title="@string/ai_help_glm"
+            app:iconSpaceReserved="false" />
+
+        <io.legado.app.lib.prefs.Preference
+            android:key="ai_help_gemini"
+            android:summary="@string/ai_help_gemini_summary"
+            android:title="@string/ai_help_gemini"
+            app:iconSpaceReserved="false" />
+
+    </io.legado.app.lib.prefs.PreferenceCategory>
+
+    <io.legado.app.lib.prefs.PreferenceCategory
+        android:title="@string/about_feature"
+        app:iconSpaceReserved="false">
+
+        <io.legado.app.lib.prefs.Preference
+            android:key="ai_feature_intro"
+            android:summary="@string/ai_feature_intro_summary"
+            android:title="@string/ai_feature_intro"
+            app:iconSpaceReserved="false" />
+
+    </io.legado.app.lib.prefs.PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>
