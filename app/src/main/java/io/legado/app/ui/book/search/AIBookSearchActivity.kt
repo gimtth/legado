@@ -7,10 +7,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import androidx.activity.viewModels
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.legado.app.R
 import io.legado.app.base.VMBaseActivity
+import io.legado.app.constant.Theme
 import io.legado.app.databinding.ActivityAiBookSearchBinding
+import io.legado.app.lib.theme.primaryColor
 import io.legado.app.utils.hideSoftInput
 import io.legado.app.utils.showSoftInput
 import io.legado.app.utils.startActivity
@@ -19,7 +23,11 @@ import io.legado.app.utils.viewbindingdelegate.viewBinding
 /**
  * AI 智能找书页面
  */
-class AIBookSearchActivity : VMBaseActivity<ActivityAiBookSearchBinding, SearchViewModel>() {
+class AIBookSearchActivity : VMBaseActivity<ActivityAiBookSearchBinding, SearchViewModel>(
+    fullScreen = false,
+    theme = Theme.Auto,
+    toolBarTheme = Theme.Auto
+) {
 
     override val binding by viewBinding(ActivityAiBookSearchBinding::inflate)
     override val viewModel by viewModels<SearchViewModel>()
@@ -32,12 +40,40 @@ class AIBookSearchActivity : VMBaseActivity<ActivityAiBookSearchBinding, SearchV
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+        setupSystemBar()
+        setupWindowInsets()
         initRecyclerView()
         initInputArea()
         observeData()
         
         // 加载历史对话
         loadChatHistory()
+    }
+
+    override fun setupSystemBar() {
+        super.setupSystemBar()
+        // 确保状态栏使用主题颜色
+        binding.titleBar.setBackgroundColor(primaryColor)
+    }
+
+    /**
+     * 设置窗口插入监听，让输入框跟随键盘
+     */
+    private fun setupWindowInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            
+            // 设置输入区域的底部边距，跟随键盘
+            binding.llInputArea.setPadding(
+                binding.llInputArea.paddingLeft,
+                binding.llInputArea.paddingTop,
+                binding.llInputArea.paddingRight,
+                if (imeInsets.bottom > 0) imeInsets.bottom else systemBarsInsets.bottom
+            )
+            
+            insets
+        }
     }
 
     override fun onCompatCreateOptionsMenu(menu: Menu): Boolean {
@@ -118,7 +154,7 @@ class AIBookSearchActivity : VMBaseActivity<ActivityAiBookSearchBinding, SearchV
 
     private fun showWelcomeMessage() {
         val welcomeMessage = """
-你好！我是 AI 找书助手 🤖
+你好！我是 AI 找书助手
 
 告诉我你想看什么类型的书，我会为你推荐合适的小说。
 
